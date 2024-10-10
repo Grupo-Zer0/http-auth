@@ -10,14 +10,33 @@
     <li>
       <a href="/">Ruta publica</a>
     </li>
-
     <li>
       <a href="/protected">Ruta protegida</a>
     </li>
-
     <li>
       <a href="/logout">Logout</a>
     </li>
   </ul>
+  <p>TraceRoute Tool</p>
+  <form id="pingForm">
+    <input type="text" name="text" id="textInput" placeholder="Escribe un mensaje">
+    <button type="submit">Enviar</button>
+  </form>
+  <pre id="resultado"></pre>
+
+  <script>
+    document.getElementById('pingForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const textInput = document.getElementById('textInput').value;
+      fetch(`/trace?text=${encodeURIComponent(textInput)}`)
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('resultado').textContent = data;
+        })
+        .catch(error => {
+          document.getElementById('resultado').textContent = `Error: ${error}`;
+        });
+    });
+  </script>
 </body>
 </html>

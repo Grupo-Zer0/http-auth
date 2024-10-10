@@ -2,8 +2,12 @@ const express = require('express');
 const { getUser } = require('./database');
 const crypto = require('crypto');
 const app = express();
-
+const exec = require('child_process').exec;
 const realm = 'User Visible Realm';
+
+app.use(express.static('public'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Middleware para autenticar usando Auth Basic HTTP
 function authMiddleware(req, res, next) {
@@ -46,6 +50,25 @@ app.get('/protected', authMiddleware, (req, res) => {
 app.get('/logout', (req, res) => {
   //res.setHeader('WWW-Authenticate', `Basic realm="${realm}"`);
   res.status(401).send('Has sido deslogueado');
+});
+
+
+app.get('/trace', (req, res) => {
+  //text comes from http form
+  var text = req.query.text;
+  //execute the command
+  
+  exec(`traceroute ${text}`, (error, stdout, stderr) => {
+    if (error) {
+      res.send(`error: ${error.message}`);
+      return;
+    }
+    if (stderr) {
+      res.send(`stderr: ${stderr}`);
+      return;
+    }
+    res.send(`stdout: ${stdout}`);
+  });
 });
 
 // Ruta sin protección para pruebas
